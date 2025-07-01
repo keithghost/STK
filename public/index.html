@@ -1,133 +1,255 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MPESA STK Push Demo</title>
-  <style>
-    body {
-      font-family: 'Arial', sans-serif;
-      line-height: 1.6;
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 20px;
-      color: #333;
-    }
-    .container {
-      background: #f9f9f9;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    h1 {
-      color: #2c3e50;
-      text-align: center;
-    }
-    button {
-      background: #3498db;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      font-size: 16px;
-      border-radius: 4px;
-      cursor: pointer;
-      display: block;
-      margin: 20px auto;
-      transition: background 0.3s;
-    }
-    button:hover {
-      background: #2980b9;
-    }
-    #response {
-      margin-top: 20px;
-      padding: 15px;
-      border-radius: 4px;
-      background: #e8f4fc;
-      display: none;
-    }
-    .success {
-      color: #27ae60;
-    }
-    .error {
-      color: #e74c3c;
-    }
-    .loading {
-      text-align: center;
-      display: none;
-    }
-    .spinner {
-      border: 4px solid rgba(0, 0, 0, 0.1);
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      border-left-color: #09f;
-      animation: spin 1s linear infinite;
-      margin: 0 auto;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M-Pesa STK Push Payment</title>
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --success-color: #28a745;
+            --error-color: #dc3545;
+            --border-color: #ced4da;
+            --text-color: #495057;
+            --light-color: #f8f9fa;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 500px;
+            margin: 30px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+        }
+        
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #0069d9;
+        }
+        
+        button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+        
+        .response {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            display: none;
+        }
+        
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+        
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+        
+        .loading {
+            text-align: center;
+            margin: 20px 0;
+            display: none;
+        }
+        
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid var(--primary-color);
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #6c757d;
+            font-size: 14px;
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h1>MPESA STK Push Demo</h1>
-    <p>Click the button below to initiate an STK push payment request to your phone.</p>
-    
-    <button id="payButton">Initiate Payment</button>
-    
-    <div class="loading" id="loading">
-      <div class="spinner"></div>
-      <p>Processing your request...</p>
+    <div class="container">
+        <h1>M-Pesa Payment</h1>
+        
+        <form id="paymentForm">
+            <div class="form-group">
+                <label for="phoneNumber">Phone Number</label>
+                <input 
+                    type="tel" 
+                    id="phoneNumber" 
+                    placeholder="2547XXXXXXXX" 
+                    pattern="^254\d{9}$" 
+                    required
+                    title="Please enter a valid Kenyan phone number starting with 254 followed by 9 digits">
+            </div>
+            
+            <div class="form-group">
+                <label for="amount">Amount (KES)</label>
+                <input 
+                    type="number" 
+                    id="amount" 
+                    min="1" 
+                    step="1" 
+                    placeholder="1" 
+                    required>
+            </div>
+            
+            <button type="submit" id="payButton">Initiate Payment</button>
+        </form>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Processing payment request...</p>
+        </div>
+        
+        <div class="response" id="response"></div>
     </div>
     
-    <div id="response"></div>
-  </div>
-
-  <script>
-    document.getElementById('payButton').addEventListener('click', async () => {
-      const payButton = document.getElementById('payButton');
-      const loading = document.getElementById('loading');
-      const responseDiv = document.getElementById('response');
-      
-      payButton.disabled = true;
-      loading.style.display = 'block';
-      responseDiv.style.display = 'none';
-      
-      try {
-        const response = await fetch('/initiate-payment', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          }
+    <footer>
+        <p>You will receive an STK Push notification on your phone to complete the payment</p>
+    </footer>
+    
+    <script>
+        document.getElementById('paymentForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const phoneNumber = document.getElementById('phoneNumber').value;
+            const amount = document.getElementById('amount').value;
+            const payButton = document.getElementById('payButton');
+            const loading = document.getElementById('loading');
+            const responseDiv = document.getElementById('response');
+            
+            // Validate phone number format
+            if (!/^254\d{9}$/.test(phoneNumber)) {
+                alert('Please enter a valid Kenyan phone number starting with 254 followed by 9 digits');
+                return;
+            }
+            
+            // Show loading, hide button
+            payButton.disabled = true;
+            loading.style.display = 'block';
+            responseDiv.style.display = 'none';
+            
+            try {
+                const response = await fetch('/initiate-payment', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        phoneNumber,
+                        amount
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    responseDiv.className = 'response success';
+                    responseDiv.innerHTML = `
+                        <h3>Payment Initiated Successfully</h3>
+                        <p>Check your phone to complete the payment. You should receive an STK Push notification.</p>
+                        <p><strong>Response:</strong> ${JSON.stringify(data.data, null, 2)}</p>
+                    `;
+                } else {
+                    responseDiv.className = 'response error';
+                    responseDiv.innerHTML = `
+                        <h3>Payment Failed</h3>
+                        <p>${data.error || 'An error occurred while initiating payment'}</p>
+                    `;
+                }
+            } catch (error) {
+                responseDiv.className = 'response error';
+                responseDiv.innerHTML = `
+                    <h3>Error</h3>
+                    <p>${error.message || 'An error occurred while processing your request'}</p>
+                `;
+            } finally {
+                loading.style.display = 'none';
+                payButton.disabled = false;
+                responseDiv.style.display = 'block';
+            }
         });
         
-        const data = await response.json();
-        
-        if (data.success) {
-          responseDiv.innerHTML = `
-            <h3 class="success">Payment request sent successfully!</h3>
-            <p>Check your phone to complete the payment.</p>
-            <p><strong>Note:</strong> This is a demo using Safaricom's sandbox environment.</p>
-          `;
-        } else {
-          responseDiv.innerHTML = `
-            <h3 class="error">Error initiating payment</h3>
-            <p>${data.error || 'Unknown error occurred'}</p>
-          `;
-        }
-      } catch (error) {
-        responseDiv.innerHTML = `
-          <h3 class="error">Network Error</h3>
-          <p>Failed to connect to the server. Please try again.</p>
-        `;
-      } finally {
-        loading.style.display = 'none';
-        responseDiv.style.display = 'block';
-        payButton.disabled = false;
-      }
-    });
-  </script>
+        // Format phone number as user types
+        document.getElementById('phoneNumber').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 0 && !value.startsWith('254')) {
+                value = '254' + value;
+            }
+            e.target.value = value.substring(0, 12);
+        });
+    </script>
 </body>
 </html>

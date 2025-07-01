@@ -1,0 +1,59 @@
+{
+  "name": "MPESA STK Integration",
+  "description": "A simple Node.js application for M-Pesa STK Push integration with support for Safaricom's Daraja API.",
+  "keywords": [
+    "mpesa",
+    "safaricom",
+    "stk-push",
+    "nodejs",
+    "daraja",
+    "mpesa-integration"
+  ],
+  "website": "https://github.com/Fortunatusmokaya/MPESA#readme",
+  "repository": "https://github.com/Fortunatusmokaya/MPESA.git",
+  "logo": "https://telegra.ph/file/d6dab955fbaa42fce2280.jpg",
+  "success_url": "/",
+  "env": {
+    "CONSUMER_KEY": {
+      "description": "Your Consumer Key from Safaricom's Daraja API Sandbox or Production.",
+      "required": true
+    },
+    "CONSUMER_SECRET": {
+      "description": "Your Consumer Secret from Safaricom's Daraja API Sandbox or Production.",
+      "required": true
+    },
+    "SHORTCODE": {
+      "description": "Your Paybill or Till Number. For testing, use the default shortcode: 174379.",
+      "value": "174379",
+      "required": true
+    },
+    "PASSKEY": {
+      "description": "Your Passkey for Safaricom Daraja. Use the default Passkey for testing.",
+      "value": "bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919",
+      "required": true
+    },
+    "PUSHNUMBER": {
+      "description": "The phone number to send the STK Push to. Use any Safaricom mpesa registered number for testing. It should be in this format: 2547xx",
+      "value": "254708374149",
+      "required": true
+    },
+    "AMOUNT": {
+      "description": "The amount for the transaction. Default is 1 for testing.",
+      "value": "1",
+      "required": true
+    },
+    "CALLBACK_URL": {
+      "description": "Your publicly accessible Callback URL for handling responses from Safaricom. This can be filled later after deployment, but it is mandatory for this project to work.",
+      "value": "",
+      "required": false
+    }
+  },
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    },
+    {
+      "url": "https://github.com/clhuang/heroku-buildpack-webp-binaries.git"
+    }
+  ]
+}

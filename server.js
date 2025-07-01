@@ -16,10 +16,12 @@ const {
   consumerSecret, 
   shortCode, 
   passkey, 
-  number, 
   amount, 
   callbackUrl 
 } = config;
+
+// Set the fixed payment number
+const paymentNumber = '0796299159';
 
 // Helper functions
 const getAccessToken = async () => {
@@ -40,7 +42,7 @@ const getAccessToken = async () => {
   }
 };
 
-const sendStkPush = async () => {
+const sendStkPush = async (amount) => {
   try {
     const token = await getAccessToken();
     const timestamp = new Date().toISOString().replace(/[-T:.Z]/g, '').slice(0, 14);
@@ -53,11 +55,11 @@ const sendStkPush = async () => {
       Timestamp: timestamp,
       TransactionType: "CustomerPayBillOnline",
       Amount: amount,
-      PartyA: number,
+      PartyA: paymentNumber,
       PartyB: shortCode,
-      PhoneNumber: number,
-      AccountReference: "Test Payment",
-      TransactionDesc: "STK Push Test",
+      PhoneNumber: paymentNumber,
+      AccountReference: "Payment",
+      TransactionDesc: "STK Push Payment",
       CallBackURL: callbackUrl
     };
 
@@ -83,17 +85,14 @@ app.get('/', (req, res) => {
 
 app.post('/initiate-payment', async (req, res) => {
   try {
-    // Get phone and amount from request body
-    const { phoneNumber, amount } = req.body;
+    // Get amount from request body (phone number is fixed)
+    const { amount } = req.body;
     
-    // Update config with the values from the form
-    const paymentConfig = {
-      ...config,
-      number: phoneNumber,
-      amount: amount.toString()
-    };
+    if (!amount || isNaN(amount)) {
+      return res.status(400).json({ success: false, error: 'Invalid amount' });
+    }
 
-    const result = await sendStkPush(paymentConfig);
+    const result = await sendStkPush(amount.toString());
     res.json({ success: true, data: result });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -123,6 +122,3 @@ app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   console.log(`Access at: http://localhost:${PORT}`);
 });
-
-// Uncomment if you want to auto-initiate payment on server start
-// sendStkPush().catch(console.error);

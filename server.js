@@ -83,7 +83,17 @@ app.get('/', (req, res) => {
 
 app.post('/initiate-payment', async (req, res) => {
   try {
-    const result = await sendStkPush();
+    // Get phone and amount from request body
+    const { phoneNumber, amount } = req.body;
+    
+    // Update config with the values from the form
+    const paymentConfig = {
+      ...config,
+      number: phoneNumber,
+      amount: amount.toString()
+    };
+
+    const result = await sendStkPush(paymentConfig);
     res.json({ success: true, data: result });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
